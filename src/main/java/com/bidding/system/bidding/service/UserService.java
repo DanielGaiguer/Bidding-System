@@ -5,10 +5,13 @@
 package com.bidding.system.bidding.service;
 
 import com.bidding.system.bidding.model.UserDTO;
+import com.bidding.system.bidding.model.UserRequestDTO;
 import com.bidding.system.bidding.repository.UserDAO;
+import java.sql.SQLException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -33,5 +36,21 @@ public class UserService {
         }
         
         repository.register(user);
+    }
+    
+    public UserDTO logar(UserRequestDTO user){
+        String msg = "";
+        
+        if (user.getEmail().equals("")){
+            msg = "Email não preenchido";
+        }else if (user.getSenha().equals("")){
+            msg = "Senha não preenhcida";
+        }
+        
+        if (!msg.equals("")){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), msg);
+        }
+        
+        return repository.login(user.getEmail(), user.getSenha());
     }
 }
