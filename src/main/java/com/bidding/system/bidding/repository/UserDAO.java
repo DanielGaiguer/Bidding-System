@@ -15,11 +15,11 @@ public class UserDAO {
         try{
             Connection conn = Conexao.conectar();
             PreparedStatement stmt = null;
-            stmt = conn.prepareStatement("INSERT INTO usuarios (nome, email, senha, role ) VALUES (?, ?, ?, ?)");
+            stmt = conn.prepareStatement("INSERT INTO usuarios (nome, email, senha, role) VALUES (?, ?, ?, ?)");
             
             stmt.setString(1, user.getNome());
             stmt.setString(2, user.getEmail());
-            stmt.setString(4, user.getSenha());
+            stmt.setString(3, user.getSenha());
             stmt.setString(4, user.getRole());
             
             int linhasAfetadas = stmt.executeUpdate();

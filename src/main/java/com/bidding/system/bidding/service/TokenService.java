@@ -22,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @Service
 public class TokenService {
-    @Value("api.security.token.service")
+    @Value("${api.security.token.secret}")
     private String secret;
     
     public SecretKey getKeySign() {
@@ -44,7 +44,7 @@ public class TokenService {
                 .compact();
     }
     
-    public userDTO extractClaims(String token){
+    public UserDTO extractClaims(String token){
         Claims claims = Jwts.parser()
                 .verifyWith(getKeySign())
                 .build()
