@@ -5,8 +5,10 @@
 package com.bidding.system.bidding.service;
 
 import com.bidding.system.bidding.model.EditalDTO;
+import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.model.UserDTO;
 import com.bidding.system.bidding.repository.EditalDAO;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -47,8 +49,10 @@ public class EditalService {
             } 
         }else{
             throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Acesso não autorizado");
-        }
-        
-        
+        }  
+    }
+    
+    public List<RequestListEditalDTO> listEditais(String token){
+        return repository.listEdital();
     }
 }

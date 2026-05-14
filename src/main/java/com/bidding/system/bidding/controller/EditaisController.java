@@ -5,9 +5,12 @@
 package com.bidding.system.bidding.controller;
 
 import com.bidding.system.bidding.model.EditalDTO;
+import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.service.EditalService;
 import com.bidding.system.bidding.service.TokenService;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -27,5 +30,11 @@ public class EditaisController {
         service.createEdital(edital, token);
         
         return "Edital Cadastrado com sucesso.";
+    }
+    
+    @GetMapping
+    public List<RequestListEditalDTO> listEdital(@RequestHeader("Authorization") String auth){
+        String token = auth.replace("Bearer ", "");
+        return service.listEditais(token);
     }
 }
