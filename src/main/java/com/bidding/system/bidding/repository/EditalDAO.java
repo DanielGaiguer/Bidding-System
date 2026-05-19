@@ -5,6 +5,7 @@
 package com.bidding.system.bidding.repository;
 
 import com.bidding.system.bidding.model.EditalDTO;
+import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -62,5 +63,75 @@ public class EditalDAO {
         }
         
         return editais; 
+    }
+    
+    public int registerLance(LancePostDTO lance){
+        try{
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = null;
+            
+            stmt = conn.prepareStatement("Insert into lances (valor, data_lance, id_edital, id_usuario) values (?, ?, ?, ?)");
+            
+            stmt.setFloat(1, lance.getValor());
+            stmt.setDate(2, lance.getDataLance());
+            stmt.setLong(3, lance.getIdEdital());
+            stmt.setLong(4, lance.getIdUsuario());
+            
+            return stmt.executeUpdate();
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return 0;
+    }
+    
+    public boolean editalEncerrado(Long id){
+        try{
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            
+            stmt = conn.prepareStatement("Select * from editais where id = ?");
+            
+            stmt.setLong(1, id);
+            
+            rs = stmt.executeQuery();
+            
+            if(rs.next()){
+                if (rs.getString("status").equals("ENCERRADO")){
+                    return true;
+                }
+            }
+            
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    
+    public EditalDTO getById(Long id){
+        EditalDTO edital = new EditalDTO();
+        try{
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            
+            stmt = conn.prepareStatement("Select data_fechamento, status from editais where id = ?");
+            stmt.setLong(1, id);
+            
+            rs = stmt.executeQuery();
+            
+            if(rs.next()){
+                edital.setDataFechamento(rs.getDate("data_fechamento"));
+                edital.setStatus(rs.getString("status"));
+            }
+            
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return edital; 
     }
 }

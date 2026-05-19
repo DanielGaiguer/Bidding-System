@@ -5,12 +5,13 @@
 package com.bidding.system.bidding.controller;
 
 import com.bidding.system.bidding.model.EditalDTO;
+import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.service.EditalService;
-import com.bidding.system.bidding.service.TokenService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -36,5 +37,13 @@ public class EditaisController {
     public List<RequestListEditalDTO> listEdital(@RequestHeader("Authorization") String auth){
         String token = auth.replace("Bearer ", "");
         return service.listEditais(token);
+    }
+    
+    @PostMapping("{id}/lances")
+    public String registerLance(@RequestHeader("Authorization") String auth, @RequestBody LancePostDTO lance, @PathVariable Long id){
+        String token = auth.replace("Bearer ", "");
+        lance.setIdEdital(id);
+        service.registerLance(token, lance);
+        return "Lance registrado com sucesso.";
     }
 }

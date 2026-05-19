@@ -5,9 +5,12 @@
 package com.bidding.system.bidding.service;
 
 import com.bidding.system.bidding.model.EditalDTO;
+import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.model.UserDTO;
 import com.bidding.system.bidding.repository.EditalDAO;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -53,6 +56,57 @@ public class EditalService {
     }
     
     public List<RequestListEditalDTO> listEditais(String token){
-        return repository.listEdital();
+        if (tokenService.validToken(token)){
+            return repository.listEdital();
+        }else {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Necessario logar conta valida");
+        }
+    }
+
+    public void registerLance(String token, LancePostDTO lance){
+        UserDTO user = tokenService.extractClaims(token);        
+        
+        if(user.getRole().equals("FORNECEDOR")) {
+            EditalDTO edital = repository.getById(lance.getIdEdital());
+            String msg = "";
+            
+            if (lance.getValor() == 0){
+                msg += "Valor não informado./n";
+            } 
+            if (lance.getIdEdital() == 0){
+                msg += "Id do edital nao informado./n";
+            }
+            if (lance.getIdUsuario()== 0){
+                msg += "Id do usuario nao informado./n";
+            }
+            if(repository.editalEncerrado(lance.getIdEdital())){
+                msg += "Este edital já esta encerrado";
+            }
+            if(!edital.getStatus().equals("ABERTO")){
+                msg += "O Edital não esta mais aberto./n";
+            }
+            if (lance.getDataLance().before(new Date())){
+                msg += "Data Inválida, coloque uma data a partir de hoje./n";
+            }
+            if(edital.getDataFechamento().before(lance.getDataLance())){
+                msg += "Data do lance posterior a data de fechamento./n";
+            }
+
+            if(!msg.equals("")){
+                throw new ResponseStatusException(HttpStatusCode.valueOf(400), msg);
+            }
+            
+            int linhas = repository.registerLance(lance);
+            if (linhas == 0){
+                throw new ResponseStatusException(HttpStatusCode.valueOf(500), "Erro ao cadastrar no banco de dados.");
+            } 
+        }else{
+            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Acesso não autorizado");
+        }  
+        lance.setIdUsuario(user.getId());
+        int linhas = repository.registerLance(lance);
+        if (linhas == 0){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(500), "Erro ao cadastrar no banco de dados.");
+        } 
     }
 }
