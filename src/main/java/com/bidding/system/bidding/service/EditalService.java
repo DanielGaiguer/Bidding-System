@@ -64,49 +64,62 @@ public class EditalService {
     }
 
     public void registerLance(String token, LancePostDTO lance){
-        UserDTO user = tokenService.extractClaims(token);        
-        
+        UserDTO user = tokenService.extractClaims(token);
+
         if(user.getRole().equals("FORNECEDOR")) {
+
             EditalDTO edital = repository.getById(lance.getIdEdital());
             String msg = "";
-            
+
             if (lance.getValor() == 0){
-                msg += "Valor não informado./n";
-            } 
+                msg += "Valor não informado.\n";
+            }
+
             if (lance.getIdEdital() == 0){
-                msg += "Id do edital nao informado./n";
+                msg += "Id do edital nao informado.\n";
             }
-            if (lance.getIdUsuario()== 0){
-                msg += "Id do usuario nao informado./n";
-            }
+
             if(repository.editalEncerrado(lance.getIdEdital())){
-                msg += "Este edital já esta encerrado";
+                msg += "Este edital já esta encerrado.\n";
             }
+
             if(!edital.getStatus().equals("ABERTO")){
-                msg += "O Edital não esta mais aberto./n";
+                msg += "O Edital não esta mais aberto.\n";
             }
+
             if (lance.getDataLance().before(new Date())){
-                msg += "Data Inválida, coloque uma data a partir de hoje./n";
+                msg += "Data inválida.\n";
             }
+
             if(edital.getDataFechamento().before(lance.getDataLance())){
-                msg += "Data do lance posterior a data de fechamento./n";
+                msg += "Data do lance posterior ao fechamento.\n";
             }
 
             if(!msg.equals("")){
-                throw new ResponseStatusException(HttpStatusCode.valueOf(400), msg);
+                throw new ResponseStatusException(
+                    HttpStatusCode.valueOf(400),
+                    msg
+                );
             }
-            
+
+            // pega o usuário do token
+            lance.setIdUsuario(user.getId());
+
+            // salva UMA vez
             int linhas = repository.registerLance(lance);
+
             if (linhas == 0){
-                throw new ResponseStatusException(HttpStatusCode.valueOf(500), "Erro ao cadastrar no banco de dados.");
-            } 
-        }else{
-            throw new ResponseStatusException(HttpStatusCode.valueOf(403), "Acesso não autorizado");
-        }  
-        lance.setIdUsuario(user.getId());
-        int linhas = repository.registerLance(lance);
-        if (linhas == 0){
-            throw new ResponseStatusException(HttpStatusCode.valueOf(500), "Erro ao cadastrar no banco de dados.");
-        } 
+                throw new ResponseStatusException(
+                    HttpStatusCode.valueOf(500),
+                    "Erro ao cadastrar no banco."
+                );
+            }
+
+        } else {
+            throw new ResponseStatusException(
+                HttpStatusCode.valueOf(403),
+                "Acesso não autorizado"
+            );
+        }
     }
 }
