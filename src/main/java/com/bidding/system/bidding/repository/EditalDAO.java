@@ -50,6 +50,7 @@ public class EditalDAO {
             while(rs.next()){
                 RequestListEditalDTO edital = new RequestListEditalDTO();
                 
+                edital.setId(rs.getLong("id"));
                 edital.setTitulo(rs.getString("titulo"));
                 edital.setDescricao(rs.getString("descricao"));
                 edital.setDataFechamento(rs.getDate("data_fechamento"));

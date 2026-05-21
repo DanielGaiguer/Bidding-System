@@ -11,6 +11,7 @@ import java.sql.Date;
  * @author gaigu
  */
 public class RequestListEditalDTO {
+    private Long id;
     private String titulo;
     private String descricao;
     private Date dataFechamento;
@@ -19,11 +20,20 @@ public class RequestListEditalDTO {
     public RequestListEditalDTO() {
     }
 
-    public RequestListEditalDTO(String titulo, String descricao, Date dataFechamento, String status) {
+    public RequestListEditalDTO(Long id, String titulo, String descricao, Date dataFechamento, String status) {
+        this.id = id;
         this.titulo = titulo;
         this.descricao = descricao;
         this.dataFechamento = dataFechamento;
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTitulo() {
