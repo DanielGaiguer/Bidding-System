@@ -7,6 +7,7 @@ package com.bidding.system.bidding.controller;
 
 import com.bidding.system.bidding.model.UserDTO;
 import com.bidding.system.bidding.model.UserRequestDTO;
+import com.bidding.system.bidding.model.UserTokenDTO;
 import com.bidding.system.bidding.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,7 +33,7 @@ public class UserController {
     }
     
     @PostMapping("/login")
-    public String login(@RequestBody UserRequestDTO user){
+    public UserTokenDTO login(@RequestBody UserRequestDTO user){
         return service.logar(user);
     }
     

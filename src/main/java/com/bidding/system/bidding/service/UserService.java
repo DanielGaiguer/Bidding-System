@@ -6,6 +6,7 @@ package com.bidding.system.bidding.service;
 
 import com.bidding.system.bidding.model.UserDTO;
 import com.bidding.system.bidding.model.UserRequestDTO;
+import com.bidding.system.bidding.model.UserTokenDTO;
 import com.bidding.system.bidding.repository.UserDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -39,7 +40,7 @@ public class UserService {
         repository.register(user);
     }
     
-    public String logar(UserRequestDTO user){
+    public UserTokenDTO logar(UserRequestDTO user){
         String msg = "";
         
         if (user.getEmail().equals("")){
@@ -53,6 +54,9 @@ public class UserService {
         }
         
         UserDTO dataLogger = repository.login(user.getEmail(), user.getSenha());
-        return tokenService.generateToken(dataLogger);
+        String token = tokenService.generateToken(dataLogger);
+        UserTokenDTO userWithToken = new UserTokenDTO(dataLogger);
+        userWithToken.setToken(token);
+        return userWithToken;
     }
 }
