@@ -31,31 +31,32 @@ public class UserDAO {
         }
     }
     
-    public UserDTO login(String email, String senha){
-        UserDTO user = new UserDTO();
-        try{
+    public UserDTO login(String email, String senha) {
+        try {
             Connection conn = Conexao.conectar();
-            PreparedStatement stmt = null;
-            ResultSet rs = null;
-            
-            stmt = conn.prepareStatement("SELECT * FROM usuarios WHERE email = ? and senha = ?");
-            
+            PreparedStatement stmt = conn.prepareStatement(
+                "SELECT * FROM usuarios WHERE email = ? AND senha = ?"
+            );
+
             stmt.setString(1, email);
             stmt.setString(2, senha);
-            
-            rs = stmt.executeQuery();
-            
-            if (rs.next()){
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                UserDTO user = new UserDTO();
                 user.setId(rs.getLong("id"));
                 user.setNome(rs.getString("nome"));
                 user.setEmail(rs.getString("email"));
                 user.setRole(rs.getString("role"));
+                return user;
             }
-            
-        }catch(SQLException e){
+
+            return null;
+
+        } catch (SQLException e) {
             e.printStackTrace();
+            return null;
         }
-        
-        return user;
-    }
+}
 }

@@ -40,23 +40,26 @@ public class UserService {
         repository.register(user);
     }
     
-    public UserTokenDTO logar(UserRequestDTO user){
-        String msg = "";
-        
-        if (user.getEmail().equals("")){
-            msg = "Email não preenchido";
-        }else if (user.getSenha().equals("")){
-            msg = "Senha não preenhcida";
+    public UserTokenDTO logar(UserRequestDTO user) {
+
+        if (user.getEmail().isBlank() || user.getSenha().isBlank()) {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Campos obrigatórios");
         }
-        
-        if (!msg.equals("")){
-            throw new ResponseStatusException(HttpStatusCode.valueOf(400), msg);
-        }
-        
+
         UserDTO dataLogger = repository.login(user.getEmail(), user.getSenha());
+
+        if (dataLogger == null || dataLogger.getId() == null) {
+            throw new ResponseStatusException(
+                HttpStatusCode.valueOf(401),
+                "Usuário ou senha inválidos"
+            );
+        }
+
         String token = tokenService.generateToken(dataLogger);
+
         UserTokenDTO userWithToken = new UserTokenDTO(dataLogger);
         userWithToken.setToken(token);
+
         return userWithToken;
     }
 }
