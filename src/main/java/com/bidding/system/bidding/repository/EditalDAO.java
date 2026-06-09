@@ -135,4 +135,27 @@ public class EditalDAO {
         
         return edital; 
     }
+    
+    public boolean jaRegistrou(Long idUsuario, Long idEdital){
+        try{
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            
+            stmt = conn.prepareStatement("Select * from lances where id_edital = ? and id_usuario = ?");
+            stmt.setLong(1, idEdital);
+            stmt.setLong(2, idUsuario);
+            
+            rs = stmt.executeQuery();
+            
+            if(rs.next()){
+                return true;
+            }
+            
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
 }

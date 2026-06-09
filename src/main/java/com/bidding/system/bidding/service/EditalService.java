@@ -67,7 +67,6 @@ public class EditalService {
         UserDTO user = tokenService.extractClaims(token);
 
         if(user.getRole().equals("FORNECEDOR")) {
-
             EditalDTO edital = repository.getById(lance.getIdEdital());
             String msg = "";
 
@@ -102,10 +101,8 @@ public class EditalService {
                 );
             }
 
-            // pega o usuário do token
             lance.setIdUsuario(user.getId());
 
-            // salva UMA vez
             int linhas = repository.registerLance(lance);
 
             if (linhas == 0){
@@ -121,5 +118,10 @@ public class EditalService {
                 "Acesso não autorizado"
             );
         }
+    }
+    
+    public boolean jaRegistrou(String token, LancePostDTO lance){
+        UserDTO user = tokenService.extractClaims(token);
+        return repository.jaRegistrou(user.getId(), lance.getIdEdital());
     }
 }

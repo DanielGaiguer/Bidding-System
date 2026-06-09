@@ -10,6 +10,7 @@ import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.service.EditalService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/editais")
@@ -43,6 +45,9 @@ public class EditaisController {
     public String registerLance(@RequestHeader("Authorization") String auth, @RequestBody LancePostDTO lance, @PathVariable Long id){
         String token = auth.replace("Bearer ", "");
         lance.setIdEdital(id);
+        if (service.jaRegistrou(token, lance)){
+            throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Você já enviou uma proposta para este edital. Utilize o recurso de atualização se desejar alterar o valor.");
+        }
         service.registerLance(token, lance);
         return "Lance registrado com sucesso.";
     }
