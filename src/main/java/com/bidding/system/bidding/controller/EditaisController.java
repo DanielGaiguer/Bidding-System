@@ -8,6 +8,7 @@ import com.bidding.system.bidding.model.EditalDTO;
 import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.service.EditalService;
+import jakarta.websocket.server.PathParam;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -36,9 +38,13 @@ public class EditaisController {
     }
     
     @GetMapping
-    public List<RequestListEditalDTO> listEdital(@RequestHeader("Authorization") String auth){
+    public List<RequestListEditalDTO> listEdital(@RequestHeader("Authorization") String auth, @RequestParam(required = false) boolean  urgente){
         String token = auth.replace("Bearer ", "");
-        return service.listEditais(token);
+        if (urgente == true){
+            return service.listEditaisUrgentes(token);
+        }else {
+            return service.listEditais(token);
+        }
     }
     
     @PostMapping("{id}/lances")

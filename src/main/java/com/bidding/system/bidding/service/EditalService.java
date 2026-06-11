@@ -9,7 +9,6 @@ import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.model.UserDTO;
 import com.bidding.system.bidding.repository.EditalDAO;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +39,9 @@ public class EditalService {
             if (edital.getDataFechamento() == null){
                 msg += "Data não preenchida.";
             }
+            if (edital.getDataFechamento().before(new Date())){
+                msg += "Data de fechamento anterior a hoje, cadastre uma data valida.";
+            }
 
             if(!msg.equals("")){
                 throw new ResponseStatusException(HttpStatusCode.valueOf(400), msg);
@@ -62,6 +64,14 @@ public class EditalService {
             throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Necessario logar conta valida");
         }
     }
+    
+    public List<RequestListEditalDTO> listEditaisUrgentes(String token) {
+       if (tokenService.validToken(token)){
+            return repository.listEditaisUrgentes();
+        }else {
+            throw new ResponseStatusException(HttpStatusCode.valueOf(401), "Necessario logar conta valida");
+        }
+    }
 
     public void registerLance(String token, LancePostDTO lance){
         UserDTO user = tokenService.extractClaims(token);
@@ -78,7 +88,7 @@ public class EditalService {
                 msg += "Id do edital nao informado.\n";
             }
 
-            if(repository.editalEncerrado(lance.getIdEdital())){
+            if(edital.getStatus().equals("ENCERRADO")){
                 msg += "Este edital já esta encerrado.\n";
             }
 
@@ -120,8 +130,10 @@ public class EditalService {
         }
     }
     
+    
     public boolean jaRegistrou(String token, LancePostDTO lance){
         UserDTO user = tokenService.extractClaims(token);
         return repository.jaRegistrou(user.getId(), lance.getIdEdital());
     }
+    
 }

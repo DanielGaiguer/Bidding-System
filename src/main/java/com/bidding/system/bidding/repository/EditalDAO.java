@@ -11,7 +11,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.springframework.stereotype.Repository;
 
@@ -54,9 +56,58 @@ public class EditalDAO {
                 edital.setTitulo(rs.getString("titulo"));
                 edital.setDescricao(rs.getString("descricao"));
                 edital.setDataFechamento(rs.getDate("data_fechamento"));
-                edital.setStatus(rs.getString("status"));
+                if (rs.getDate("data_fechamento").before(new Date()) && !"ENCERRADO".equals(rs.getString("status"))) {
+                    stmt = conn.prepareStatement("Update editais set status = 'ENCERRADO' where id = ?");
+                    stmt.setLong(1, edital.getId());
+                    stmt.executeUpdate();
+                    edital.setStatus("ENCERRADO");
+                }else{
+                    edital.setStatus(rs.getString("status"));
+                }
+                
                 
                 editais.add(edital);
+            }
+            
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        
+        return editais; 
+    }
+    
+    public List<RequestListEditalDTO> listEditaisUrgentes(){
+        List<RequestListEditalDTO> editais = new ArrayList<RequestListEditalDTO>();
+        try{
+            Connection conn = Conexao.conectar();
+            PreparedStatement stmt = null;
+            ResultSet rs = null;
+            LocalDateTime agora = LocalDateTime.now();
+            LocalDateTime limite = agora.plusHours(48);
+            
+            stmt = conn.prepareStatement("Select * from editais");
+            
+            rs = stmt.executeQuery();
+            
+            while(rs.next()){
+                LocalDateTime fechamento = rs.getTimestamp("data_fechamento").toLocalDateTime();
+
+                if ("ABERTO".equals(rs.getString("status"))&& fechamento.isAfter(agora) && fechamento.isBefore(limite)) {
+                    RequestListEditalDTO edital = new RequestListEditalDTO();
+                    edital.setId(rs.getLong("id"));
+                    edital.setTitulo(rs.getString("titulo"));
+                    edital.setDescricao(rs.getString("descricao"));
+                    edital.setDataFechamento(rs.getDate("data_fechamento"));
+                    edital.setStatus(rs.getString("status"));
+                    editais.add(edital);
+                }
+                
+                if (rs.getDate("data_fechamento").before(new Date()) && !"ENCERRADO".equals(rs.getString("status"))) {
+                    stmt = conn.prepareStatement("Update editais set status = 'ENCERRADO' where id = ?");
+                    stmt.setLong(1, rs.getLong("id"));
+                    stmt.executeUpdate();
+                }                
+
             }
             
         }catch(SQLException e){
@@ -126,7 +177,14 @@ public class EditalDAO {
             
             if(rs.next()){
                 edital.setDataFechamento(rs.getDate("data_fechamento"));
-                edital.setStatus(rs.getString("status"));
+                if (rs.getDate("data_fechamento").before(new Date()) && !"ENCERRADO".equals(rs.getString("status"))) {
+                    stmt = conn.prepareStatement("Update editais set status = 'ENCERRADO' where id = ?");
+                    stmt.setLong(1, id);
+                    stmt.executeUpdate();
+                    edital.setStatus("ENCERRADO");
+                }else {
+                    edital.setStatus(rs.getString("status"));
+                }
             }
             
         }catch(SQLException e){
