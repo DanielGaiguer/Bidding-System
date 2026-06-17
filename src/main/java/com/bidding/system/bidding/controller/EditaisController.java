@@ -8,7 +8,7 @@ import com.bidding.system.bidding.model.EditalDTO;
 import com.bidding.system.bidding.model.LancePostDTO;
 import com.bidding.system.bidding.model.RequestListEditalDTO;
 import com.bidding.system.bidding.service.EditalService;
-import jakarta.websocket.server.PathParam;
+import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
@@ -54,6 +54,7 @@ public class EditaisController {
         if (service.jaRegistrou(token, lance)){
             throw new ResponseStatusException(HttpStatusCode.valueOf(400), "Você já enviou uma proposta para este edital. Utilize o recurso de atualização se desejar alterar o valor.");
         }
+        lance.setDataLance(new Date());
         service.registerLance(token, lance);
         return "Lance registrado com sucesso.";
     }

@@ -96,10 +96,6 @@ public class EditalService {
                 msg += "O Edital não esta mais aberto.\n";
             }
 
-            if (lance.getDataLance().before(new Date())){
-                msg += "Data inválida.\n";
-            }
-
             if(edital.getDataFechamento().before(lance.getDataLance())){
                 msg += "Data do lance posterior ao fechamento.\n";
             }

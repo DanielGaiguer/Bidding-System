@@ -125,7 +125,7 @@ public class EditalDAO {
             stmt = conn.prepareStatement("Insert into lances (valor, data_lance, id_edital, id_usuario) values (?, ?, ?, ?)");
             
             stmt.setFloat(1, lance.getValor());
-            stmt.setDate(2, lance.getDataLance());
+            stmt.setDate(2, new java.sql.Date(lance.getDataLance().getTime()));
             stmt.setLong(3, lance.getIdEdital());
             stmt.setLong(4, lance.getIdUsuario());
             

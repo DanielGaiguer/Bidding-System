@@ -4,7 +4,7 @@
  */
 package com.bidding.system.bidding.model;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  *
